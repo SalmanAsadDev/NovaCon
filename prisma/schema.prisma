@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://neondb_owner:npg_StEpb5Fc2gWm@ep-lively-grass-ay60zg7c-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+}
+
+// =====================
+// Auth.js required models
+// =====================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String    // bcrypt hash
+  role          Role      @default(VIEWER)
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      AuthSession[]
+}
+
+enum Role {
+  ADMIN
+  VIEWER
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model AuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// =====================
+// Event models
+// =====================
+
+model Speaker {
+  id        String    @id @default(cuid())
+  name      String
+  jobTitle  String
+  track     String
+  bio       String
+  avatar    String    // initials e.g. "SK"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sessions  Session[]
+}
+
+model Session {
+  id          String        @id @default(cuid())
+  title       String
+  track       String
+  venue       String
+  day         Int
+  time        String        // "09:00"
+  durationMin Int
+  capacity    Int
+  registered  Int           @default(0)
+  status      SessionStatus @default(UPCOMING)
+  speakerId   String?
+  speaker     Speaker?      @relation(fields: [speakerId], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum SessionStatus {
+  UPCOMING
+  LIVE
+  FULL
+  ENDED
+}
+
+model Registration {
+  id           String             @id @default(cuid())
+  name         String
+  email        String
+  university   String
+  track        String
+  ticketType   TicketType
+  status       RegistrationStatus @default(REGISTERED)
+  registeredAt DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+enum TicketType {
+  STANDARD
+  PREMIUM
+  WORKSHOP
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CHECKED_IN
+  CANCELLED
+}
+
+model RegistrationDayStat {
+  id    String @id @default(cuid())
+  date  String // e.g. "Oct 1"
+  count Int
+}

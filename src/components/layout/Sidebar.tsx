@@ -13,7 +13,6 @@ const nav = [
 
 export default function Sidebar({ user }: { user: any }) {
     const pathname = usePathname()
-    // @ts-expect-error custom role
     const isAdmin = user?.role === 'ADMIN'
 
     return (

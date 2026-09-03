@@ -82,9 +82,9 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+            <div className="dashboard-main-grid">
                 <div className="card">
-                    <h3 style={{ fontSize: '16px', marginBottom: '16px' }}>Event Progress</h3>
+                    <h3 style={{ fontSize: '16px', marginBottom: '16px', fontFamily: 'Sora, sans-serif' }}>Event Progress</h3>
                     
                     <div style={{ marginBottom: '24px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
@@ -108,9 +108,8 @@ export default async function DashboardPage() {
                 </div>
 
                 <div className="card">
-                    <h3 style={{ fontSize: '16px', marginBottom: '16px' }}>Quick Actions</h3>
+                    <h3 style={{ fontSize: '16px', marginBottom: '16px', fontFamily: 'Sora, sans-serif' }}>Quick Actions</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {/* @ts-expect-error custom role */}
                         {session?.user?.role === 'ADMIN' && (
                             <>
                                 <a href="/registrations" className="btn btn-ghost" style={{ justifyContent: 'space-between', padding: '12px' }}>
@@ -124,7 +123,6 @@ export default async function DashboardPage() {
                                 </a>
                             </>
                         )}
-                        {/* @ts-expect-error custom role */}
                         {session?.user?.role !== 'ADMIN' && (
                             <div className="alert alert-info">
                                 Your account has Viewer access. You can view sessions, speakers, and analytics, but cannot modify data or view attendee PII.

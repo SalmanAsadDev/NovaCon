@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Speaker {
     id: string
@@ -24,6 +25,8 @@ interface Session {
 export default function EditSessionForm({ session, speakers }: { session: Session, speakers: Speaker[] }) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [error, setError] = useState('')
 
     const [formData, setFormData] = useState({
@@ -73,8 +76,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
     }
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this session? This action cannot be undone.')) return
-        setLoading(true)
+        setDeleteLoading(true)
         setError('')
 
         try {
@@ -84,14 +86,17 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
 
             if (!res.ok) {
                 setError('Failed to delete session')
-                setLoading(false)
+                setDeleteLoading(false)
+                setShowDeleteModal(false)
             } else {
+                setShowDeleteModal(false)
                 router.push('/sessions')
                 router.refresh()
             }
         } catch (err) {
             setError('Network error')
-            setLoading(false)
+            setDeleteLoading(false)
+            setShowDeleteModal(false)
         }
     }
 
@@ -122,7 +127,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                     <h1 className="page-title">Edit Session</h1>
                     <p className="page-subtitle">Update schedule and status for: {session.title}</p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <button 
                         type="button" 
                         onClick={handleCycleStatus} 
@@ -135,7 +140,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+            <div className="edit-layout-grid">
                 <div className="card">
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {error && <div className="alert alert-error">{error}</div>}
@@ -151,7 +156,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                             />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="form-grid-2">
                             <div className="form-group">
                                 <label className="form-label">Track</label>
                                 <select
@@ -188,7 +193,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                        <div className="form-grid-3">
                             <div className="form-group">
                                 <label className="form-label">Day</label>
                                 <select
@@ -225,7 +230,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="form-grid-2">
                             <div className="form-group">
                                 <label className="form-label">Speaker (Optional)</label>
                                 <select
@@ -253,7 +258,7 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px' }}>
-                            <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
+                            <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, justifyContent: 'center', padding: '10px' }}>
                                 {loading ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
@@ -261,21 +266,34 @@ export default function EditSessionForm({ session, speakers }: { session: Sessio
                 </div>
 
                 <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: 'fit-content' }}>
-                    <h3 style={{ fontSize: '15px', color: 'var(--red)' }}>Danger Zone</h3>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    <h3 style={{ fontSize: '15px', color: 'var(--red)', fontFamily: 'Sora, sans-serif' }}>Danger Zone</h3>
+                    <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                         Deleting this session will remove it permanently. Registered attendees count will be lost.
                     </p>
                     <button 
                         type="button" 
-                        onClick={handleDelete} 
+                        onClick={() => setShowDeleteModal(true)} 
                         className="btn btn-danger" 
-                        disabled={loading}
-                        style={{ justifyContent: 'center', width: '100%' }}
+                        disabled={loading || deleteLoading}
+                        style={{ justifyContent: 'center', width: '100%', padding: '10px' }}
                     >
                         Delete Session
                     </button>
                 </div>
             </div>
+
+            {/* Custom Modal Confirmation */}
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDelete}
+                title="Delete Session"
+                description={`Are you sure you want to delete "${session.title}"? This action cannot be undone and will permanently remove this session from the schedule.`}
+                confirmText="Delete Session"
+                cancelText="Cancel"
+                variant="danger"
+                loading={deleteLoading}
+            />
         </div>
     )
 }

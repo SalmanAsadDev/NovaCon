@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Speaker {
     id: string
@@ -15,6 +16,8 @@ interface Speaker {
 export default function EditSpeakerForm({ speaker }: { speaker: Speaker }) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [error, setError] = useState('')
     
     const [formData, setFormData] = useState({
@@ -58,8 +61,7 @@ export default function EditSpeakerForm({ speaker }: { speaker: Speaker }) {
     }
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this speaker? This will detach the speaker from all scheduled sessions.')) return
-        setLoading(true)
+        setDeleteLoading(true)
         setError('')
 
         try {
@@ -69,14 +71,17 @@ export default function EditSpeakerForm({ speaker }: { speaker: Speaker }) {
 
             if (!res.ok) {
                 setError('Failed to delete speaker')
-                setLoading(false)
+                setDeleteLoading(false)
+                setShowDeleteModal(false)
             } else {
+                setShowDeleteModal(false)
                 router.push('/speakers')
                 router.refresh()
             }
         } catch (err) {
             setError('Network error')
-            setLoading(false)
+            setDeleteLoading(false)
+            setShowDeleteModal(false)
         }
     }
 
@@ -90,7 +95,7 @@ export default function EditSpeakerForm({ speaker }: { speaker: Speaker }) {
                 <Link href="/speakers" className="btn btn-ghost">Cancel</Link>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+            <div className="edit-layout-grid">
                 <div className="card">
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {error && <div className="alert alert-error">{error}</div>}
@@ -117,7 +122,7 @@ export default function EditSpeakerForm({ speaker }: { speaker: Speaker }) {
                             />
                         </div>
                         
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="form-grid-2">
                             <div className="form-group">
                                 <label className="form-label">Track</label>
                                 <select
@@ -160,28 +165,41 @@ export default function EditSpeakerForm({ speaker }: { speaker: Speaker }) {
                             />
                         </div>
                         
-                        <button type="submit" className="btn btn-primary" disabled={loading} style={{ justifyContent: 'center' }}>
+                        <button type="submit" className="btn btn-primary" disabled={loading} style={{ justifyContent: 'center', padding: '10px' }}>
                             {loading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </form>
                 </div>
 
                 <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: 'fit-content' }}>
-                    <h3 style={{ fontSize: '15px', color: 'var(--red)' }}>Danger Zone</h3>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    <h3 style={{ fontSize: '15px', color: 'var(--red)', fontFamily: 'Sora, sans-serif' }}>Danger Zone</h3>
+                    <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                         Deleting this speaker will remove them permanently. Scheduled sessions for this speaker will be set to TBA.
                     </p>
                     <button 
                         type="button" 
-                        onClick={handleDelete} 
+                        onClick={() => setShowDeleteModal(true)} 
                         className="btn btn-danger" 
-                        disabled={loading}
-                        style={{ justifyContent: 'center', width: '100%' }}
+                        disabled={loading || deleteLoading}
+                        style={{ justifyContent: 'center', width: '100%', padding: '10px' }}
                     >
                         Delete Speaker
                     </button>
                 </div>
             </div>
+
+            {/* Custom Modal Confirmation */}
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDelete}
+                title="Delete Speaker"
+                description={`Are you sure you want to delete ${speaker.name}? This will remove their speaker profile and detach them from all assigned sessions.`}
+                confirmText="Delete Speaker"
+                cancelText="Cancel"
+                variant="danger"
+                loading={deleteLoading}
+            />
         </div>
     )
 }

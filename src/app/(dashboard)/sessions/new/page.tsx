@@ -86,7 +86,7 @@ export default function NewSessionPage() {
                         />
                     </div>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-2">
                         <div className="form-group">
                             <label className="form-label">Track</label>
                             <select
@@ -123,7 +123,7 @@ export default function NewSessionPage() {
                         </div>
                     </div>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-3">
                         <div className="form-group">
                             <label className="form-label">Day</label>
                             <select
@@ -160,7 +160,7 @@ export default function NewSessionPage() {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="form-grid-2">
                         <div className="form-group">
                             <label className="form-label">Speaker (Optional)</label>
                             <select

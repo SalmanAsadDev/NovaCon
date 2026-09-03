@@ -61,15 +61,15 @@ export default async function RegistrationsPage({
                 </div>
             </div>
 
-            <div className="card" style={{ marginBottom: '24px', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="card filter-bar-container" style={{ marginBottom: '24px', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <Link href="/registrations" className={`btn ${!status ? 'btn-primary' : 'btn-ghost'} btn-sm`}>All</Link>
                     <Link href="/registrations?status=REGISTERED" className={`btn ${status === 'REGISTERED' ? 'btn-primary' : 'btn-ghost'} btn-sm`}>Pending Check-in</Link>
                     <Link href="/registrations?status=CHECKED_IN" className={`btn ${status === 'CHECKED_IN' ? 'btn-primary' : 'btn-ghost'} btn-sm`}>Checked In</Link>
                 </div>
                 
-                {/* Search Form - normally a client component, but we can do it with a simple HTML form for RSC */}
-                <form action="/registrations" method="GET" style={{ display: 'flex', gap: '8px' }}>
+                {/* Search Form */}
+                <form action="/registrations" method="GET" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {status && <input type="hidden" name="status" value={status} />}
                     <input 
                         type="text" 
@@ -77,7 +77,7 @@ export default async function RegistrationsPage({
                         defaultValue={search || ''} 
                         placeholder="Search name, email, university..." 
                         className="form-input"
-                        style={{ width: '250px', padding: '6px 12px', fontSize: '13px' }}
+                        style={{ minWidth: '200px', padding: '6px 12px', fontSize: '13px' }}
                     />
                     <button type="submit" className="btn btn-ghost btn-sm">Search</button>
                     {search && (
@@ -127,13 +127,13 @@ export default async function RegistrationsPage({
                                             {r.status === 'CHECKED_IN' ? 'Checked In' : 'Registered'}
                                         </span>
                                     </td>
-                                    <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
+                                    <td style={{ color: 'var(--text-muted)', fontSize: '12px', whiteSpace: 'nowrap' }}>
                                         {new Date(r.registeredAt).toLocaleDateString()}
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             {r.status !== 'CHECKED_IN' && (
-                                                <CheckInButton id={r.id} />
+                                                <CheckInButton id={r.id} attendeeName={r.name} />
                                             )}
                                         </div>
                                     </td>

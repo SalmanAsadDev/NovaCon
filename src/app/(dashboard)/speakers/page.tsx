@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import DeleteSpeakerButton from './DeleteSpeakerButton'
 
 export default async function SpeakersPage({
     searchParams
@@ -8,7 +9,6 @@ export default async function SpeakersPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
     const session = await auth()
-    // @ts-expect-error custom role
     const isAdmin = session?.user?.role === 'ADMIN'
     
     const resolvedParams = await searchParams
@@ -35,7 +35,7 @@ export default async function SpeakersPage({
             </div>
 
             <div className="card" style={{ marginBottom: '24px', padding: '16px' }}>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <Link href="/speakers" className={`btn ${!trackFilter ? 'btn-primary' : 'btn-ghost'} btn-sm`}>All Tracks</Link>
                     <Link href="/speakers?track=AI & ML" className={`btn ${trackFilter === 'AI & ML' ? 'btn-primary' : 'btn-ghost'} btn-sm`}>AI & ML</Link>
                     <Link href="/speakers?track=Web Dev" className={`btn ${trackFilter === 'Web Dev' ? 'btn-primary' : 'btn-ghost'} btn-sm`}>Web Dev</Link>
@@ -44,7 +44,7 @@ export default async function SpeakersPage({
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
                 {speakers.length === 0 ? (
                     <div style={{ gridColumn: '1 / -1' }} className="empty-state card">
                         <div className="empty-state-icon">◉</div>
@@ -55,23 +55,23 @@ export default async function SpeakersPage({
                         <div key={speaker.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', marginBottom: '16px' }}>
                                 <div style={{
-                                    width: '64px', height: '64px', borderRadius: '50%',
+                                    width: '56px', height: '56px', borderRadius: '50%',
                                     background: 'var(--bg-surface-2)', border: '1px solid var(--border)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', flexShrink: 0
+                                    fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', flexShrink: 0
                                 }}>
                                     {speaker.avatar}
                                 </div>
-                                <div>
-                                    <h3 style={{ fontSize: '16px', marginBottom: '2px' }}>{speaker.name}</h3>
-                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>{speaker.jobTitle}</div>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                    <h3 style={{ fontSize: '16px', marginBottom: '2px', wordBreak: 'break-word' }}>{speaker.name}</h3>
+                                    <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '8px', wordBreak: 'break-word' }}>{speaker.jobTitle}</div>
                                     <span className="badge" style={{ background: 'var(--bg-surface-2)', border: '1px solid var(--border)' }}>
                                         {speaker.track}
                                     </span>
                                 </div>
                             </div>
                             
-                            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px', flex: 1 }}>
+                            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px', flex: 1, lineHeight: '1.5' }}>
                                 {speaker.bio}
                             </p>
                             
@@ -98,7 +98,7 @@ export default async function SpeakersPage({
                             {isAdmin && (
                                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                                     <Link href={`/speakers/${speaker.id}/edit`} className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: 'center' }}>Edit</Link>
-                                    <button className="btn btn-danger btn-sm">Delete</button>
+                                    <DeleteSpeakerButton id={speaker.id} speakerName={speaker.name} />
                                 </div>
                             )}
                         </div>

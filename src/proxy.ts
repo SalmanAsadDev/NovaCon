@@ -53,7 +53,6 @@ export async function proxy(request: NextRequest) {
         const isAdminOnlyPage = ADMIN_ONLY_PAGES.some(p => pathname.startsWith(p))
         const isAdminEditPage = pathname.includes('/edit')
         const isAdminApiMethod = ['POST', 'PATCH', 'DELETE'].includes(request.method)
-        // @ts-expect-error role is custom
         const role = session.user?.role as string
 
         if ((isAdminOnlyPage || isAdminEditPage) && role !== 'ADMIN') {

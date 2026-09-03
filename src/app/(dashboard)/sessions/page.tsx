@@ -8,7 +8,6 @@ export default async function SessionsPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
     const session = await auth()
-    // @ts-expect-error custom role
     const isAdmin = session?.user?.role === 'ADMIN'
     
     // Await searchParams in Next.js 15+

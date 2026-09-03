@@ -10,7 +10,6 @@ export async function GET() {
         id: session.user.id,
         name: session.user.name,
         email: session.user.email,
-        // @ts-expect-error role is custom
         role: session.user.role,
     })
 }

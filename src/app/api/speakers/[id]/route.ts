@@ -29,7 +29,6 @@ export async function PATCH(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const authSession = await auth()
-    // @ts-expect-error custom role
     if (authSession?.user?.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
@@ -53,7 +52,6 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const authSession = await auth()
-    // @ts-expect-error custom role
     if (authSession?.user?.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

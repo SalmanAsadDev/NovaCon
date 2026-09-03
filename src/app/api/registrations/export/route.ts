@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
     const authSession = await auth()
-    // @ts-expect-error custom role
     if (authSession?.user?.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

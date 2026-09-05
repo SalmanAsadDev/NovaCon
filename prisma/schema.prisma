@@ -14,25 +14,6 @@ datasource db {
 // Auth.js required models
 // =====================
 
-model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  password      String    // bcrypt hash
-  role          Role      @default(VIEWER)
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      AuthSession[]
-}
-
-enum Role {
-  ADMIN
-  VIEWER
-}
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -46,12 +27,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@unique([provider, providerAccountId])
 }
 
@@ -62,7 +40,6 @@ model AuthSession {
   expires      DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -70,41 +47,214 @@ model VerificationToken {
   identifier String
   token      String
   expires    DateTime
-
   @@unique([identifier, token])
 }
 
 // =====================
-// Event models
+// User (extended)
+// =====================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String?   // nullable for OAuth-only accounts
+  phone         String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      AuthSession[]
+  memberships   OrgMember[]
+  passwordResetTokens PasswordResetToken[]
+  createdFinanceRecords FinanceRecord[] @relation("CreatedBy")
+  updatedFinanceRecords FinanceRecord[] @relation("UpdatedBy")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// =====================
+// Organization
+// =====================
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique  // URL-safe identifier e.g. "abc-events"
+  logo        String?
+  website     String?
+  description String?
+  country     String   @default("PK")
+  currency    String   @default("PKR")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     OrgMember[]
+  events      Event[]
+  financeRecords FinanceRecord[]
+}
+
+enum OrgRole {
+  OWNER
+  EVENT_MANAGER
+  EVENT_PLANNER
+  FINANCE
+  STAFF
+}
+
+model OrgMember {
+  id       String   @id @default(cuid())
+  orgId    String
+  userId   String
+  role     OrgRole
+  joinedAt DateTime @default(now())
+
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventAssignments EventMember[]
+
+  @@unique([orgId, userId])
+}
+
+model OrgInvitation {
+  id        String    @id @default(cuid())
+  orgId     String
+  email     String
+  role      OrgRole
+  token     String    @unique
+  expiresAt DateTime
+  acceptedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// =====================
+// Event
+// =====================
+
+enum EventStatus {
+  DRAFT
+  PLANNING
+  PUBLISHED
+  LIVE
+  COMPLETED
+  CANCELLED
+  ARCHIVED
+}
+
+model Event {
+  id               String      @id @default(cuid())
+  orgId            String
+  name             String
+  slug             String      @unique
+  description      String?
+  eventType        String?     // e.g. "Tech Conference", "Workshop", "Summit"
+  status           EventStatus @default(DRAFT)
+  startDate        DateTime
+  endDate          DateTime
+  venue            String?
+  city             String?
+  country          String      @default("PK")
+  expectedAttendees Int?
+  capacity         Int         @default(1500)
+  bannerImage      String?
+  isPublic         Boolean     @default(false)  // visible on public landing page
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  org              Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  members          EventMember[]
+  speakers         Speaker[]
+  sessions         Session[]
+  registrations    Registration[]
+  financeRecords   FinanceRecord[]
+  vendors          Vendor[]
+  ticketTypes      TicketTier[]
+  payments         Payment[]
+}
+
+model EventMember {
+  id          String    @id @default(cuid())
+  eventId     String
+  memberId    String    // references OrgMember.id
+  assignedAt  DateTime  @default(now())
+
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  member      OrgMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, memberId])
+}
+
+// =====================
+// Ticket tiers (replaces hardcoded prices)
+// =====================
+
+model TicketTier {
+  id          String  @id @default(cuid())
+  eventId     String
+  name        String  // "Standard", "Premium", "Workshop"
+  code        String  // "STANDARD", "PREMIUM", "WORKSHOP"
+  price       Decimal
+  currency    String  @default("PKR")
+  capacity    Int?
+  description String?
+  isActive    Boolean @default(true)
+
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrations Registration[]
+  payments      Payment[]
+}
+
+// =====================
+// Speaker (extended — now event-scoped)
 // =====================
 
 model Speaker {
   id        String    @id @default(cuid())
+  eventId   String
   name      String
   jobTitle  String
   track     String
   bio       String
-  avatar    String    // initials e.g. "SK"
+  avatar    String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
   sessions  Session[]
 }
 
+// =====================
+// Session (extended — now event-scoped)
+// =====================
+
 model Session {
   id          String        @id @default(cuid())
+  eventId     String
   title       String
   track       String
   venue       String
   day         Int
-  time        String        // "09:00"
+  time        String
   durationMin Int
   capacity    Int
   registered  Int           @default(0)
   status      SessionStatus @default(UPCOMING)
   speakerId   String?
-  speaker     Speaker?      @relation(fields: [speakerId], references: [id], onDelete: SetNull)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  speaker   Speaker? @relation(fields: [speakerId], references: [id], onDelete: SetNull)
 }
 
 enum SessionStatus {
@@ -114,22 +264,28 @@ enum SessionStatus {
   ENDED
 }
 
-model Registration {
-  id           String             @id @default(cuid())
-  name         String
-  email        String
-  university   String
-  track        String
-  ticketType   TicketType
-  status       RegistrationStatus @default(REGISTERED)
-  registeredAt DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-}
+// =====================
+// Registration (extended — event-scoped, ticket tier link)
+// =====================
 
-enum TicketType {
-  STANDARD
-  PREMIUM
-  WORKSHOP
+model Registration {
+  id             String             @id @default(cuid())
+  eventId        String
+  name           String
+  email          String
+  phone          String?
+  university     String
+  track          String
+  ticketTierId   String?            // links to TicketTier
+  ticketType     String             // kept for backward compat during migration
+  status         RegistrationStatus @default(REGISTERED)
+  registeredAt   DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  paymentId      String?            @unique
+
+  event       Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketTier  TicketTier? @relation(fields: [ticketTierId], references: [id])
+  payment     Payment?    @relation(fields: [paymentId], references: [id])
 }
 
 enum RegistrationStatus {
@@ -138,8 +294,135 @@ enum RegistrationStatus {
   CANCELLED
 }
 
+// =====================
+// Vendor
+// =====================
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  BLACKLISTED
+}
+
+model Vendor {
+  id           String       @id @default(cuid())
+  eventId      String
+  name         String
+  category     String       // "Catering", "AV/Production", "Security", etc.
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  status       VendorStatus @default(ACTIVE)
+  notes        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  financeRecords FinanceRecord[]
+}
+
+// =====================
+// Finance
+// =====================
+
+enum FinanceType {
+  EXPENSE
+  PAYABLE
+  RECEIVABLE
+  BUDGET
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  OVERDUE
+  CANCELLED
+}
+
+model FinanceRecord {
+  id              String        @id @default(cuid())
+  orgId           String
+  eventId         String?       // null = org-level record
+  vendorId        String?
+  type            FinanceType
+  category        String?       // "Catering", "AV", "Sponsorship", etc.
+  description     String
+  budgetedAmount  Decimal?      // planned
+  actualAmount    Decimal       // confirmed amount
+  paidAmount      Decimal       @default(0)
+  currency        String        @default("PKR")
+  paymentStatus   PaymentStatus @default(PENDING)
+  dueDate         DateTime?
+  paidDate        DateTime?
+  invoiceNumber   String?
+  referenceNumber String?
+  notes           String?
+  createdById     String
+  updatedById     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  event      Event?       @relation(fields: [eventId], references: [id])
+  vendor     Vendor?      @relation(fields: [vendorId], references: [id])
+  createdBy  User         @relation("CreatedBy", fields: [createdById], references: [id])
+  updatedBy  User?        @relation("UpdatedBy", fields: [updatedById], references: [id])
+
+  @@index([orgId, eventId])
+  @@index([paymentStatus])
+}
+
+// =====================
+// Payments (attendee ticket payments)
+// =====================
+
+enum PaymentMethod {
+  STRIPE
+  JAZZCASH
+  EASYPAISA
+  BANK_TRANSFER
+  CASH
+  SAFEPAY
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Payment {
+  id                String            @id @default(cuid())
+  eventId           String
+  ticketTierId      String?
+  amount            Decimal
+  currency          String            @default("PKR")
+  method            PaymentMethod?
+  status            TransactionStatus @default(PENDING)
+  gatewayProvider   String?           // "stripe", "safepay"
+  gatewayPaymentId  String?           // gateway's transaction ID
+  gatewayResponse   Json?             // raw gateway webhook payload
+  refundedAmount    Decimal           @default(0)
+  metadata          Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  event        Event         @relation(fields: [eventId], references: [id])
+  ticketTier   TicketTier?   @relation(fields: [ticketTierId], references: [id])
+  registration Registration?
+}
+
+// =====================
+// Legacy — kept for migration period
+// =====================
+
 model RegistrationDayStat {
   id    String @id @default(cuid())
-  date  String // e.g. "Oct 1"
+  date  String
   count Int
 }

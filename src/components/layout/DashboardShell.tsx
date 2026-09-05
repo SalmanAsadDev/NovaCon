@@ -95,7 +95,7 @@ export default function DashboardShell({
                 </div>
             </div>
             <button 
-                onClick={() => signOut({ callbackUrl: '/login' })}
+                onClick={() => signOut({ callbackUrl: '/' })}
                 className="btn btn-ghost" 
                 style={{ width: '100%', justifyContent: 'center' }}
             >

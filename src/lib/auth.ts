@@ -32,6 +32,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 })
                 if (!user) return null
 
+                if (!user.password) return null
+
                 const valid = await bcrypt.compare(parsed.data.password, user.password)
                 if (!valid) return null
 
@@ -39,7 +41,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     id: user.id,
                     email: user.email,
                     name: user.name,
-                    role: user.role,
                 }
             },
         }),
@@ -48,14 +49,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id
-                token.role = user.role
             }
             return token
         },
         async session({ session, token }) {
             if (token && session.user) {
                 session.user.id = token.id as string
-                session.user.role = token.role as string
             }
             return session
         },

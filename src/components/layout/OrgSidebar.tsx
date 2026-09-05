@@ -3,17 +3,28 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 
-const nav = [
-    { href: '/dashboard', label: 'Overview', icon: '▦' },
-    { href: '/sessions', label: 'Sessions', icon: '◫' },
-    { href: '/speakers', label: 'Speakers', icon: '◉' },
-    { href: '/registrations', label: 'Registrations', icon: '≡', adminOnly: true },
-    { href: '/analytics', label: 'Analytics', icon: '◈' },
-]
-
-export default function Sidebar({ user }: { user: any }) {
+export default function OrgSidebar({ org, user, role }: { org: any, user: any, role: string }) {
     const pathname = usePathname()
-    const isAdmin = user?.role === 'ADMIN'
+
+    // Determine if we are inside an event workspace
+    const eventMatch = pathname.match(/\/events\/([^/]+)/)
+    const activeEventSlug = eventMatch ? eventMatch[1] : null
+
+    const orgNav = [
+        { href: `/org/${org.slug}/events`, label: 'Events', icon: '▦' },
+        { href: `/org/${org.slug}/settings`, label: 'Org Settings', icon: '◫' },
+    ]
+
+    const eventNav = activeEventSlug ? [
+        { href: `/org/${org.slug}/events/${activeEventSlug}/overview`, label: 'Overview', icon: '▦' },
+        { href: `/org/${org.slug}/events/${activeEventSlug}/attendees`, label: 'Attendees', icon: '≡' },
+        { href: `/org/${org.slug}/events/${activeEventSlug}/speakers`, label: 'Speakers', icon: '◉' },
+        { href: `/org/${org.slug}/events/${activeEventSlug}/sessions`, label: 'Sessions', icon: '◫' },
+        { href: `/org/${org.slug}/events/${activeEventSlug}/finance`, label: 'Finance', icon: '◈' },
+        { href: `/org/${org.slug}/events/${activeEventSlug}/settings`, label: 'Settings', icon: '⚙' },
+    ] : []
+
+    const navToRender = activeEventSlug ? eventNav : orgNav
 
     return (
         <aside style={{
@@ -33,17 +44,24 @@ export default function Sidebar({ user }: { user: any }) {
                     fontSize: '18px',
                     color: 'var(--accent)',
                     letterSpacing: '-0.3px',
-                }}>NovaCon</div>
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                }}>{org.name}</div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', letterSpacing: '0.5px' }}>
-                    ISLAMABAD 2025
+                    {activeEventSlug ? 'EVENT WORKSPACE' : 'ORGANIZATION'}
                 </div>
+                {activeEventSlug && (
+                    <Link href={`/org/${org.slug}/events`} style={{ fontSize: '11px', color: 'var(--accent)', marginTop: '8px', display: 'inline-block' }}>
+                        ← Back to Events
+                    </Link>
+                )}
             </div>
 
             {/* Nav */}
             <nav style={{ flex: 1 }}>
-                {nav.map(({ href, label, icon, adminOnly }) => {
-                    if (adminOnly && !isAdmin) return null
-                    const active = pathname === href || pathname.startsWith(href + '/')
+                {navToRender.map(({ href, label, icon }) => {
+                    const active = pathname === href || pathname.startsWith(href + '/') && label !== 'Overview' && label !== 'Events'
                     return (
                         <Link key={href} href={href} style={{
                             display: 'flex',
@@ -78,7 +96,7 @@ export default function Sidebar({ user }: { user: any }) {
                     </div>
                     <div style={{ overflow: 'hidden' }}>
                         <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{user?.role}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{role}</div>
                     </div>
                 </div>
                 <button 

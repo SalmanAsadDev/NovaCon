@@ -4,9 +4,7 @@ import type { NextRequest } from 'next/server'
 import { auth } from './lib/auth'
 
 // Protected page routes
-const PROTECTED_PAGES = ['/dashboard', '/sessions', '/speakers', '/registrations', '/analytics']
-// Admin-only pages
-const ADMIN_ONLY_PAGES = ['/sessions/new', '/speakers/new']
+const PROTECTED_PAGES = ['/dashboard', '/org', '/onboarding']
 
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
@@ -32,9 +30,14 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next()
     }
 
+    // Allow public API routes
+    if (pathname.startsWith('/api/public')) {
+        return NextResponse.next()
+    }
+
     // Check auth for protected routes
     const isProtectedPage = PROTECTED_PAGES.some(p => pathname.startsWith(p))
-    const isApiRoute = pathname.startsWith('/api/')
+    const isApiRoute = pathname.startsWith('/api/') && !pathname.startsWith('/api/public')
 
     if (isProtectedPage || isApiRoute) {
         const session = await auth()
@@ -47,26 +50,6 @@ export async function proxy(request: NextRequest) {
             const loginUrl = new URL('/login', request.url)
             loginUrl.searchParams.set('callbackUrl', pathname)
             return NextResponse.redirect(loginUrl)
-        }
-
-        // Admin-only checks
-        const isAdminOnlyPage = ADMIN_ONLY_PAGES.some(p => pathname.startsWith(p))
-        const isAdminEditPage = pathname.includes('/edit')
-        const isAdminApiMethod = ['POST', 'PATCH', 'DELETE'].includes(request.method)
-        const role = session.user?.role as string
-
-        if ((isAdminOnlyPage || isAdminEditPage) && role !== 'ADMIN') {
-            return NextResponse.redirect(new URL('/dashboard', request.url))
-        }
-
-        // Block non-admin write API calls
-        if (isApiRoute && isAdminApiMethod && role !== 'ADMIN') {
-            return Response.json({ error: 'Forbidden' }, { status: 403 })
-        }
-
-        // Block non-admin from registrations data
-        if (pathname.startsWith('/api/registrations') && request.method === 'GET' && role !== 'ADMIN') {
-            return Response.json({ error: 'Forbidden' }, { status: 403 })
         }
     }
 

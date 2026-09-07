@@ -1,4 +1,4 @@
-// src/proxy.ts  (Next.js 16 renamed middleware → proxy)
+// src/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { auth } from './lib/auth'
@@ -6,7 +6,7 @@ import { auth } from './lib/auth'
 // Protected page routes
 const PROTECTED_PAGES = ['/dashboard', '/org', '/onboarding']
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // Allow public routes

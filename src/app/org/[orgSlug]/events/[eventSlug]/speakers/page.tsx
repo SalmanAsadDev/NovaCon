@@ -20,6 +20,7 @@ export default function SpeakersPage({ params }: { params: Promise<{ orgSlug: st
     const [search, setSearch] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
     const [error, setError] = useState('')
     const [formData, setFormData] = useState({ name: '', jobTitle: '', track: 'AI / ML', bio: '', avatar: '' })
 
@@ -58,9 +59,14 @@ export default function SpeakersPage({ params }: { params: Promise<{ orgSlug: st
         } catch (err: any) { setError(err.message) }
     }
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Delete this speaker?')) return
-        await fetch(`/api/org/${orgSlug}/events/${eventSlug}/speakers/${id}`, { method: 'DELETE' })
+    const handleDelete = (id: string) => {
+        setDeleteConfirmId(id)
+    }
+
+    const executeDelete = async () => {
+        if (!deleteConfirmId) return
+        await fetch(`/api/org/${orgSlug}/events/${eventSlug}/speakers/${deleteConfirmId}`, { method: 'DELETE' })
+        setDeleteConfirmId(null)
         fetchSpeakers()
     }
 
@@ -172,6 +178,25 @@ export default function SpeakersPage({ params }: { params: Promise<{ orgSlug: st
                                 <button type="submit" className="btn btn-primary">{editingId ? 'Save Changes' : 'Add Speaker'}</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirmId && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+                    <div className="card" style={{ width: '400px', maxWidth: '90vw', padding: '32px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                            <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)' }}>Confirm Deletion</h2>
+                            <button onClick={() => setDeleteConfirmId(null)} className="btn btn-ghost" style={{ padding: '4px' }}><X size={20} /></button>
+                        </div>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
+                            Are you sure you want to delete this speaker? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                            <button onClick={() => setDeleteConfirmId(null)} className="btn btn-ghost">Cancel</button>
+                            <button onClick={executeDelete} className="btn" style={{ background: 'var(--red)', color: 'white', border: 'none' }}>Delete</button>
+                        </div>
                     </div>
                 </div>
             )}

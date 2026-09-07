@@ -12,10 +12,16 @@ const PROTECTED_PAGES = ['/dashboard', '/org', '/onboarding']
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
 
-    // Allow public routes
+    // Redirect logged-in users away from auth pages
+    if (pathname === '/login' || pathname === '/register') {
+        if (auth) {
+            return NextResponse.redirect(new URL('/dashboard', request.url))
+        }
+        return NextResponse.next()
+    }
+
+    // Allow other public routes
     if (
-        pathname === '/login' ||
-        pathname === '/register' ||
         pathname.startsWith('/api/auth') ||
         pathname.startsWith('/_next') ||
         pathname.startsWith('/favicon')

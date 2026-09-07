@@ -28,24 +28,27 @@ export default async function OrgLayout({
     }
 
     return (
-        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-            <OrgSidebar org={membership.org} user={session.user} role={membership.role} />
-            <main style={{ 
-                flex: 1, 
-                overflowY: 'auto',
-                background: 'var(--bg-base)',
-                position: 'relative'
-            }}>
-                <div style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, height: '300px',
-                    background: 'radial-gradient(ellipse at top right, var(--accent-dim) 0%, transparent 70%)',
-                    opacity: 0.15, pointerEvents: 'none', zIndex: 0
-                }} />
-                
-                <div style={{ position: 'relative', zIndex: 1, padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
-                    {children}
-                </div>
-            </main>
+        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', flexDirection: 'column' }} className="mobile-dashboard-wrapper">
+            {/* The OrgSidebar handles both mobile topbar and desktop sidebar internally using CSS media queries */}
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+                <OrgSidebar org={membership.org} user={session.user} role={membership.role} />
+                <main className="dashboard-content-main" style={{ 
+                    flex: 1, 
+                    overflowY: 'auto',
+                    background: 'var(--bg-base)',
+                    position: 'relative'
+                }}>
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, height: '300px',
+                        background: 'radial-gradient(ellipse at top right, var(--accent-dim) 0%, transparent 70%)',
+                        opacity: 0.15, pointerEvents: 'none', zIndex: 0
+                    }} />
+                    
+                    <div style={{ position: 'relative', zIndex: 1, padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
+                        {children}
+                    </div>
+                </main>
+            </div>
         </div>
     )
 }

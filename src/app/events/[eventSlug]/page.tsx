@@ -19,7 +19,7 @@ export default async function PublicEventPage({ params }: { params: Promise<{ ev
         }
     })
 
-    if (!event || !event.isPublic || !['PUBLISHED', 'LIVE'].includes(event.status)) {
+    if (!event || !event.isPublic || !['PUBLISHED', 'LIVE', 'UPCOMING'].includes(event.status)) {
         notFound()
     }
 

@@ -1,10 +1,13 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import { Menu, X } from 'lucide-react'
 
 export default function OrgSidebar({ org, user, role }: { org: any, user: any, role: string }) {
     const pathname = usePathname()
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     // Determine if we are inside an event workspace
     const eventMatch = pathname.match(/\/events\/([^/]+)/)
@@ -26,36 +29,38 @@ export default function OrgSidebar({ org, user, role }: { org: any, user: any, r
 
     const navToRender = activeEventSlug ? eventNav : orgNav
 
-    return (
-        <aside style={{
-            width: 'var(--sidebar-width)',
-            background: 'var(--bg-surface)',
-            borderRight: '1px solid var(--border)',
-            display: 'flex',
-            flexDirection: 'column',
-            flexShrink: 0,
-            padding: '24px 0',
-        }}>
+    const renderContent = () => (
+        <>
             {/* Brand */}
-            <div style={{ padding: '0 20px 28px' }}>
-                <div style={{
-                    fontFamily: 'Sora, sans-serif',
-                    fontWeight: 700,
-                    fontSize: '18px',
-                    color: 'var(--accent)',
-                    letterSpacing: '-0.3px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                }}>{org.name}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', letterSpacing: '0.5px' }}>
-                    {activeEventSlug ? 'EVENT WORKSPACE' : 'ORGANIZATION'}
+            <div style={{ padding: '0 20px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                    <div style={{
+                        fontFamily: 'Sora, sans-serif',
+                        fontWeight: 700,
+                        fontSize: '18px',
+                        color: 'var(--accent)',
+                        letterSpacing: '-0.3px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                    }}>{org.name}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', letterSpacing: '0.5px' }}>
+                        {activeEventSlug ? 'EVENT WORKSPACE' : 'ORGANIZATION'}
+                    </div>
+                    {activeEventSlug && (
+                        <Link href={`/org/${org.slug}/events`} onClick={() => setIsMobileOpen(false)} style={{ fontSize: '11px', color: 'var(--accent)', marginTop: '8px', display: 'inline-block' }}>
+                            ← Back to Events
+                        </Link>
+                    )}
                 </div>
-                {activeEventSlug && (
-                    <Link href={`/org/${org.slug}/events`} style={{ fontSize: '11px', color: 'var(--accent)', marginTop: '8px', display: 'inline-block' }}>
-                        ← Back to Events
-                    </Link>
-                )}
+                {/* Close button for mobile */}
+                <button 
+                    className="btn btn-ghost btn-icon" 
+                    style={{ display: isMobileOpen ? 'flex' : 'none', border: 'none' }}
+                    onClick={() => setIsMobileOpen(false)}
+                >
+                    <X size={20} />
+                </button>
             </div>
 
             {/* Nav */}
@@ -63,7 +68,7 @@ export default function OrgSidebar({ org, user, role }: { org: any, user: any, r
                 {navToRender.map(({ href, label, icon }) => {
                     const active = pathname === href || pathname.startsWith(href + '/') && label !== 'Overview' && label !== 'Events'
                     return (
-                        <Link key={href} href={href} style={{
+                        <Link key={href} href={href} onClick={() => setIsMobileOpen(false)} style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '10px',
@@ -107,6 +112,43 @@ export default function OrgSidebar({ org, user, role }: { org: any, user: any, r
                     Logout
                 </button>
             </div>
-        </aside>
+        </>
+    )
+
+    return (
+        <div className="sidebar-container" style={{ flexShrink: 0 }}>
+            {/* Mobile Topbar */}
+            <div className="mobile-topbar">
+                <div style={{ fontWeight: 700, color: 'var(--accent)' }}>{org.name}</div>
+                <button className="btn btn-ghost btn-icon" style={{ border: 'none' }} onClick={() => setIsMobileOpen(true)}>
+                    <Menu size={20} />
+                </button>
+            </div>
+
+            {/* Mobile Drawer Backdrop */}
+            {isMobileOpen && (
+                <div className="mobile-drawer-backdrop" onClick={() => setIsMobileOpen(false)} />
+            )}
+
+            {/* Mobile Drawer */}
+            {isMobileOpen && (
+                <aside className="mobile-drawer" style={{ padding: '24px 0' }}>
+                    {renderContent()}
+                </aside>
+            )}
+
+            {/* Desktop Sidebar */}
+            <aside className="sidebar-desktop" style={{
+                width: 'var(--sidebar-width)',
+                background: 'var(--bg-surface)',
+                borderRight: '1px solid var(--border)',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh',
+                padding: '24px 0',
+            }}>
+                {renderContent()}
+            </aside>
+        </div>
     )
 }

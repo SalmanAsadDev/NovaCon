@@ -14,7 +14,8 @@ export async function proxy(request: NextRequest) {
 
     // Redirect logged-in users away from auth pages
     if (pathname === '/login' || pathname === '/register') {
-        if (auth) {
+        const session = await auth()
+        if (session) {
             return NextResponse.redirect(new URL('/dashboard', request.url))
         }
         return NextResponse.next()

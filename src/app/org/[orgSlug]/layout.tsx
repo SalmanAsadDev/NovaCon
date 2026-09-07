@@ -1,4 +1,5 @@
 import OrgSidebar from '@/components/layout/OrgSidebar'
+import MobileTopbar from '@/components/layout/MobileTopbar'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
@@ -28,23 +29,29 @@ export default async function OrgLayout({
     }
 
     return (
-        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', flexDirection: 'column' }} className="mobile-dashboard-wrapper">
-            {/* The OrgSidebar handles both mobile topbar and desktop sidebar internally using CSS media queries */}
-            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+            {/* Mobile topbar — only visible on ≤768px, sits above the content row */}
+            <MobileTopbar org={membership.org} />
+
+            {/* Main content row: sidebar (desktop) + page content */}
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
                 <OrgSidebar org={membership.org} user={session.user} role={membership.role} />
-                <main className="dashboard-content-main" style={{ 
-                    flex: 1, 
-                    overflowY: 'auto',
-                    background: 'var(--bg-base)',
-                    position: 'relative'
-                }}>
+                <main
+                    className="dashboard-content-main"
+                    style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        background: 'var(--bg-base)',
+                        position: 'relative',
+                    }}
+                >
                     <div style={{
                         position: 'absolute', top: 0, left: 0, right: 0, height: '300px',
                         background: 'radial-gradient(ellipse at top right, var(--accent-dim) 0%, transparent 70%)',
                         opacity: 0.15, pointerEvents: 'none', zIndex: 0
                     }} />
-                    
-                    <div style={{ position: 'relative', zIndex: 1, padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
+                    <div style={{ position: 'relative', zIndex: 1, padding: '32px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
                         {children}
                     </div>
                 </main>
@@ -52,3 +59,4 @@ export default async function OrgLayout({
         </div>
     )
 }
+

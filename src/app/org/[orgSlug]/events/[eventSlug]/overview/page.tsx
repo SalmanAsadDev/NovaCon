@@ -168,7 +168,7 @@ export default async function EventOverviewPage({
             </div>
 
             {/* Quick Actions & Ticket Tiers */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="form-grid-2" style={{ gap: '24px' }}>
                 <div className="card" style={{ padding: '24px' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
                         Ticket Tiers

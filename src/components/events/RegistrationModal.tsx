@@ -128,7 +128,7 @@ export default function RegistrationModal({ event, tiers }: { event: any, tiers:
                                         <label className="form-label">Email Address *</label>
                                         <input type="email" required className="form-input" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                                     </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                    <div className="form-grid-2">
                                         <div className="form-group">
                                             <label className="form-label">Phone Number</label>
                                             <input className="form-input" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />

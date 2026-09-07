@@ -43,30 +43,30 @@ export default async function AttendeesPage({ params }: { params: Promise<{ orgS
                     <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Once people register, they will appear here.</p>
                 </div>
             ) : (
-                <div className="card" style={{ overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <div className="table-wrapper">
+                    <table className="table">
                         <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                            <tr>
                                 {['Name', 'Email', 'Ticket Type', 'Registration Date', 'Status'].map(h => (
-                                    <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
+                                    <th key={h}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {attendees.map(a => (
-                                <tr key={a.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                    <td style={{ padding: '14px 16px', color: 'var(--text-primary)', fontWeight: 500 }}>{a.name}</td>
-                                    <td style={{ padding: '14px 16px', color: 'var(--text-secondary)' }}>{a.email}</td>
-                                    <td style={{ padding: '14px 16px' }}>
-                                        <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'var(--bg-highlight)', fontSize: '12px' }}>
+                                <tr key={a.id}>
+                                    <td style={{ fontWeight: 500 }}>{a.name}</td>
+                                    <td style={{ color: 'var(--text-secondary)' }}>{a.email}</td>
+                                    <td>
+                                        <span className="badge badge-standard">
                                             {a.ticketTier?.name || 'Standard'}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '14px 16px', color: 'var(--text-secondary)' }}>
+                                    <td style={{ color: 'var(--text-secondary)' }}>
                                         {new Date(a.registeredAt).toLocaleDateString()}
                                     </td>
-                                    <td style={{ padding: '14px 16px' }}>
-                                        <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(0, 255, 128, 0.1)', color: '#00ff80', fontSize: '12px' }}>
+                                    <td>
+                                        <span className="badge badge-checked-in">
                                             {a.status}
                                         </span>
                                     </td>

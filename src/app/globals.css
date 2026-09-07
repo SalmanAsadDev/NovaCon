@@ -535,13 +535,19 @@ input, select, textarea {
   z-index: 50;
 }
 
-.mobile-drawer-backdrop {
-  display: none;
+/* Mobile sidebar drawer — always rendered in DOM, off-screen by default */
+.mobile-sidebar-drawer {
+  display: none !important;
 }
 
-.sidebar-container {
-  display: flex;
-  flex-direction: column;
+/* Mobile backdrop — hidden on desktop */
+.mobile-only-backdrop {
+  display: none !important;
+}
+
+/* The X close button inside the drawer — hidden on desktop sidebar */
+.sidebar-close-btn {
+  display: none !important;
 }
 
 /* ── Responsive Media Queries ─────────────────────────── */
@@ -555,47 +561,42 @@ input, select, textarea {
 }
 
 @media (max-width: 768px) {
-  :root {
-    --sidebar-width: 280px;
-  }
-
   .mobile-topbar {
     display: flex;
   }
 
-  /* Desktop sidebar turns into off-canvas drawer on mobile */
+  /* Hide desktop sidebar on mobile */
   .sidebar-desktop {
     display: none !important;
   }
 
-  .mobile-drawer-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 999;
-    animation: modalFadeIn 0.2s ease both;
+  /* Show mobile-only elements */
+  .mobile-sidebar-drawer {
+    display: flex !important;
   }
 
-  .mobile-drawer {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: var(--sidebar-width);
-    max-width: 85vw;
-    background: var(--bg-surface);
-    z-index: 1000;
-    box-shadow: 12px 0 32px rgba(0, 0, 0, 0.6);
-    animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
-    display: flex;
-    flex-direction: column;
+  .mobile-only-backdrop {
+    display: block !important;
+  }
+
+  .sidebar-close-btn {
+    display: flex !important;
   }
 
   .dashboard-content-main {
+    padding: 0 !important;
+  }
+
+  .dashboard-content-main > div:last-child {
     padding: 16px !important;
+  }
+
+  /* Mobile topbar lives outside the flex row, above it — handled by column layout */
+  .mobile-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    flex-shrink: 0;
   }
 
   .page-header {

@@ -1,0 +1,103 @@
+[
+    {
+        "id": "sp1",
+        "name": "Dr. Sadia Khalid",
+        "title": "Associate Professor, NUST",
+        "track": "AI & ML",
+        "sessions": [
+            "s1",
+            "s4"
+        ],
+        "bio": "Leading researcher in quantum ML with 40+ publications. Previously at MIT CSAIL.",
+        "avatar": "SK"
+    },
+    {
+        "id": "sp2",
+        "name": "Usman Tariq",
+        "title": "Senior Engineer, Arbisoft",
+        "track": "Web Dev",
+        "sessions": [
+            "s2"
+        ],
+        "bio": "Core contributor to 3 open-source WebAssembly runtimes. 8 years in systems programming.",
+        "avatar": "UT"
+    },
+    {
+        "id": "sp3",
+        "name": "Hira Baig",
+        "title": "DevOps Lead, Systems Ltd",
+        "track": "DevOps",
+        "sessions": [
+            "s3",
+            "s11"
+        ],
+        "bio": "Built CI/CD infrastructure serving 2M+ daily deployments. AWS certified solutions architect.",
+        "avatar": "HB"
+    },
+    {
+        "id": "sp4",
+        "name": "Bilal Chaudhry",
+        "title": "Co-founder, ChainPK",
+        "track": "Blockchain",
+        "sessions": [
+            "s5"
+        ],
+        "bio": "Founded Pakistan's first DeFi protocol. Previously blockchain lead at HBL Digital.",
+        "avatar": "BC"
+    },
+    {
+        "id": "sp5",
+        "name": "Fatima Noor",
+        "title": "ICPC World Finalist",
+        "track": "CP",
+        "sessions": [
+            "s6"
+        ],
+        "bio": "Ranked #1 in Pakistan on Codeforces. Coached national competitive programming team 2023–24.",
+        "avatar": "FN"
+    },
+    {
+        "id": "sp6",
+        "name": "Ahmed Raza",
+        "title": "Security Researcher, NCCS",
+        "track": "Cybersecurity",
+        "sessions": [
+            "s7"
+        ],
+        "bio": "Discovered 12 CVEs in major Pakistani banking systems. Bug bounty hunter, OSCP certified.",
+        "avatar": "AR"
+    },
+    {
+        "id": "sp7",
+        "name": "Zara Malik",
+        "title": "Frontend Architect, Airlift",
+        "track": "Web Dev",
+        "sessions": [
+            "s8"
+        ],
+        "bio": "Scaled React frontend to 1M+ concurrent users. Core team of React Pakistan community.",
+        "avatar": "ZM"
+    },
+    {
+        "id": "sp8",
+        "name": "Dr. Omar Sheikh",
+        "title": "NLP Research Lead, Replit",
+        "track": "AI & ML",
+        "sessions": [
+            "s9"
+        ],
+        "bio": "PhD from Stanford. Built multilingual LLM fine-tuning pipeline for Urdu and regional languages.",
+        "avatar": "OS"
+    },
+    {
+        "id": "sp9",
+        "name": "Nadia Hussain",
+        "title": "Partner, Indus Valley Capital",
+        "track": "Entrepreneurship",
+        "sessions": [
+            "s10"
+        ],
+        "bio": "Led Series A investments in 14 Pakistani startups. Former VP at Careem.",
+        "avatar": "NH"
+    }
+]

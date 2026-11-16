@@ -1,0 +1,182 @@
+[
+    {
+        "id": "r001",
+        "name": "Ayesha Raza",
+        "university": "NUST",
+        "track": "AI & ML",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-01"
+    },
+    {
+        "id": "r002",
+        "name": "Hassan Mirza",
+        "university": "LUMS",
+        "track": "Web Dev",
+        "ticket": "Standard",
+        "status": "checked-in",
+        "date": "2025-10-02"
+    },
+    {
+        "id": "r003",
+        "name": "Ibrahim Khan",
+        "university": "FAST Lahore",
+        "track": "Cybersecurity",
+        "ticket": "Standard",
+        "status": "registered",
+        "date": "2025-10-03"
+    },
+    {
+        "id": "r004",
+        "name": "Zara Niazi",
+        "university": "COMSATS",
+        "track": "AI & ML",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-03"
+    },
+    {
+        "id": "r005",
+        "name": "Ahmed Farooq",
+        "university": "IBA Karachi",
+        "track": "Blockchain",
+        "ticket": "Standard",
+        "status": "registered",
+        "date": "2025-10-04"
+    },
+    {
+        "id": "r006",
+        "name": "Maryam Siddiqui",
+        "university": "GIKI",
+        "track": "CP",
+        "ticket": "Workshop",
+        "status": "checked-in",
+        "date": "2025-10-04"
+    },
+    {
+        "id": "r007",
+        "name": "Bilal Ahmed",
+        "university": "UET Lahore",
+        "track": "DevOps",
+        "ticket": "Standard",
+        "status": "checked-in",
+        "date": "2025-10-05"
+    },
+    {
+        "id": "r008",
+        "name": "Sana Yousuf",
+        "university": "FAST Islamabad",
+        "track": "Web Dev",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-05"
+    },
+    {
+        "id": "r009",
+        "name": "Omar Khalid",
+        "university": "NUST",
+        "track": "Emerging Tech",
+        "ticket": "Standard",
+        "status": "registered",
+        "date": "2025-10-06"
+    },
+    {
+        "id": "r010",
+        "name": "Fatima Sheikh",
+        "university": "LUMS",
+        "track": "Entrepreneurship",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-06"
+    },
+    {
+        "id": "r011",
+        "name": "Ali Hassan",
+        "university": "ITU",
+        "track": "AI & ML",
+        "ticket": "Standard",
+        "status": "registered",
+        "date": "2025-10-07"
+    },
+    {
+        "id": "r012",
+        "name": "Hina Butt",
+        "university": "FAST Karachi",
+        "track": "Cybersecurity",
+        "ticket": "Workshop",
+        "status": "checked-in",
+        "date": "2025-10-07"
+    },
+    {
+        "id": "r013",
+        "name": "Saad Iqbal",
+        "university": "UCP",
+        "track": "Blockchain",
+        "ticket": "Standard",
+        "status": "registered",
+        "date": "2025-10-08"
+    },
+    {
+        "id": "r014",
+        "name": "Nimra Javed",
+        "university": "COMSATS",
+        "track": "Web Dev",
+        "ticket": "Standard",
+        "status": "checked-in",
+        "date": "2025-10-08"
+    },
+    {
+        "id": "r015",
+        "name": "Faisal Mahmood",
+        "university": "GIKI",
+        "track": "DevOps",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-09"
+    },
+    {
+        "id": "r016",
+        "name": "Amna Riaz",
+        "university": "QAU",
+        "track": "CP",
+        "ticket": "Workshop",
+        "status": "registered",
+        "date": "2025-10-09"
+    },
+    {
+        "id": "r017",
+        "name": "Tariq Mehmood",
+        "university": "NUST",
+        "track": "AI & ML",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-10"
+    },
+    {
+        "id": "r018",
+        "name": "Lubna Awan",
+        "university": "FAST Islamabad",
+        "track": "Entrepreneurship",
+        "ticket": "Standard",
+        "status": "checked-in",
+        "date": "2025-10-10"
+    },
+    {
+        "id": "r019",
+        "name": "Waqar Ali",
+        "university": "UET Peshawar",
+        "track": "Cybersecurity",
+        "ticket": "Standard",
+        "status": "registered",
+        "date": "2025-10-11"
+    },
+    {
+        "id": "r020",
+        "name": "Khadija Malik",
+        "university": "IBA Karachi",
+        "track": "Web Dev",
+        "ticket": "Premium",
+        "status": "checked-in",
+        "date": "2025-10-11"
+    }
+]

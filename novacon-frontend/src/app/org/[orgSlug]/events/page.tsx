@@ -2,12 +2,28 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { CalendarDays } from 'lucide-react'
 
-export default async function OrgEventsPage({ params }: { params: Promise<{ orgSlug: string }> }) {
+const STATUS_COLORS: Record<string, string> = {
+    LIVE: 'var(--green)',
+    PUBLISHED: 'var(--accent)',
+    PLANNING: 'var(--blue)',
+    DRAFT: 'var(--text-muted)',
+    COMPLETED: 'var(--purple)',
+    CANCELLED: 'var(--red)',
+    ARCHIVED: 'var(--text-muted)',
+}
+const FILTERS = ['ALL', 'DRAFT', 'PLANNING', 'PUBLISHED', 'LIVE', 'COMPLETED']
+
+export default async function OrgEventsPage({ params, searchParams }: {
+    params: Promise<{ orgSlug: string }>
+    searchParams: Promise<{ status?: string }>
+}) {
     const session = await auth()
     if (!session?.user) redirect('/login')
 
     const { orgSlug } = await params
+    const { status: statusFilter = 'ALL' } = await searchParams
 
     const membership = await prisma.orgMember.findFirst({
         where: {
@@ -22,7 +38,10 @@ export default async function OrgEventsPage({ params }: { params: Promise<{ orgS
     }
 
     const events = await prisma.event.findMany({
-        where: { orgId: membership.orgId },
+        where: {
+            orgId: membership.orgId,
+            ...(statusFilter !== 'ALL' ? { status: statusFilter as any } : {}),
+        },
         orderBy: { startDate: 'desc' },
         include: {
             _count: {
@@ -47,9 +66,30 @@ export default async function OrgEventsPage({ params }: { params: Promise<{ orgS
                 )}
             </div>
 
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                {FILTERS.map(f => {
+                    const active = statusFilter === f
+                    return (
+                        <Link
+                            key={f}
+                            href={f === 'ALL' ? `/org/${orgSlug}/events` : `/org/${orgSlug}/events?status=${f}`}
+                            style={{
+                                padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 600,
+                                textDecoration: 'none', letterSpacing: '0.3px',
+                                background: active ? 'var(--accent)' : 'var(--bg-surface-2)',
+                                color: active ? 'var(--text-inverse)' : 'var(--text-secondary)',
+                                border: '1px solid var(--border)',
+                            }}
+                        >
+                            {f === 'ALL' ? 'All' : f.charAt(0) + f.slice(1).toLowerCase()}
+                        </Link>
+                    )
+                })}
+            </div>
+
             {events.length === 0 ? (
                 <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📅</div>
+                    <CalendarDays size={48} style={{ margin: '0 auto 16px', opacity: 0.5, color: 'var(--text-muted)' }} />
                     <h3 style={{ fontSize: '20px', color: 'var(--text-primary)', marginBottom: '8px' }}>No events found</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>Get started by creating your first event.</p>
                     {['OWNER', 'EVENT_MANAGER'].includes(membership.role) && (
@@ -66,13 +106,13 @@ export default async function OrgEventsPage({ params }: { params: Promise<{ orgS
                 }}>
                     {events.map((event) => (
                         <Link key={event.id} href={`/org/${orgSlug}/events/${event.slug}/overview`} style={{ textDecoration: 'none' }}>
-                            <div className="card" style={{ 
-                                padding: '24px', 
-                                height: '100%', 
-                                display: 'flex', 
+                            <div className="card card-hover" style={{
+                                padding: '24px',
+                                height: '100%',
+                                display: 'flex',
                                 flexDirection: 'column',
-                                transition: 'all 0.2s',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                borderLeft: `3px solid ${STATUS_COLORS[event.status] || 'var(--border)'}`
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                                     <div style={{

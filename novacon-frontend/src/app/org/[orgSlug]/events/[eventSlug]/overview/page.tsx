@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Calendar, Users, Mic2, Clock, MapPin, ArrowUpRight, CheckCircle2 } from 'lucide-react'
+import { Calendar, Users, Mic2, Clock, MapPin, ArrowUpRight, DollarSign } from 'lucide-react'
 
 export default async function EventOverviewPage({
     params
@@ -32,6 +32,15 @@ export default async function EventOverviewPage({
     if (!event || event.org.slug !== orgSlug) {
         notFound()
     }
+
+    const revenueRows = await prisma.registration.findMany({
+        where: { eventId: event.id, status: { not: 'CANCELLED' } },
+        select: { ticketTier: { select: { price: true } } },
+    })
+    const revenue = revenueRows.reduce((sum, r) => sum + (r.ticketTier ? Number(r.ticketTier.price) : 0), 0)
+    const capacityPct = event.capacity > 0
+        ? Math.min(100, Math.round((event._count.registrations / event.capacity) * 100))
+        : 0
 
     // Dynamic Day Counter logic
     const today = new Date()
@@ -84,6 +93,14 @@ export default async function EventOverviewPage({
             icon: Clock,
             color: 'var(--purple)',
             link: `/org/${orgSlug}/events/${eventSlug}/sessions`
+        },
+        {
+            title: 'Ticket Revenue',
+            value: revenue.toLocaleString(),
+            sub: 'Non-cancelled registrations',
+            icon: DollarSign,
+            color: 'var(--green)',
+            link: `/org/${orgSlug}/events/${eventSlug}/finance`
         },
     ]
 
@@ -165,6 +182,19 @@ export default async function EventOverviewPage({
                         </div>
                     )
                 })}
+            </div>
+
+            {/* Capacity Progress */}
+            <div className="card" style={{ padding: '24px', marginBottom: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 500 }}>Registration Capacity</span>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 600 }}>
+                        {event._count.registrations} / {event.capacity} ({capacityPct}%)
+                    </span>
+                </div>
+                <div style={{ width: '100%', height: '10px', background: 'var(--bg-highlight)', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${capacityPct}%`, background: capacityPct >= 100 ? 'var(--red)' : 'var(--accent)', transition: 'width 0.3s' }} />
+                </div>
             </div>
 
             {/* Quick Actions & Ticket Tiers */}
